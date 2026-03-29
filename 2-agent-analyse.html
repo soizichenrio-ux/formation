@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyse Financement — Adecco Training</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--rouge:#E8001C;--noir:#0f0f0f;--fond:#F4F3F0;--blanc:#fff;--border:#E0DFDB;--sec:#5a5a5a;--vert:#1a7f5a;--orange:#d97706;--bleu:#1d4ed8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--fond);color:var(--noir);min-height:100vh}
+header{background:var(--noir);padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.badge{background:var(--rouge);color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:3px}
+header h1{color:white;font-family:'DM Serif Display',serif;font-size:16px;font-weight:400}
+.wrap{padding:16px;max-width:640px;margin:0 auto}
+.sh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--rouge);margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.sh:first-child{margin-top:0}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--sec);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--fond);color:var(--noir)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--rouge);background:white}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none}
+textarea{resize:vertical;min-height:75px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'DM Serif Display',serif;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px}
+.btn-rouge{background:var(--rouge);color:white}
+.btn-rouge:disabled{background:#ccc;cursor:not-allowed}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--sec);font-family:'DM Sans',sans-serif;font-size:14px}
+.spinner{width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result-box{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
+.result-box h3{font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.montant-badge{background:var(--noir);color:white;border-radius:10px;padding:12px 16px;text-align:center;font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:14px}
+.dispo{background:white;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px}
+.dispo-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.dispo-nom{font-family:'DM Serif Display',serif;font-size:16px;flex:1}
+.badge-p{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px}
+.badge-m{font-size:11px;font-weight:600;padding:3px 9px;border-radius:10px;background:#fff0f0;color:var(--rouge)}
+.p1{background:#dcfce7;color:#166534}.p2{background:#fef3c7;color:#92400e}.p3{background:#dbeafe;color:#1e40af}.p0{background:#f3f4f6;color:#6b7280}
+.dispo-desc{font-size:13px;color:#444;line-height:1.7;margin-bottom:10px}
+.dispo-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meta-item{background:var(--fond);padding:7px 10px;border-radius:6px}
+.meta-item strong{display:block;font-size:10px;color:var(--sec);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.meta-item span{font-size:12px}
+.etape{display:flex;gap:10px;margin-bottom:10px;font-size:13px;align-items:flex-start}
+.etape-n{background:var(--rouge);color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.alert{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px;font-size:13px;color:var(--orange);line-height:1.6;margin-bottom:14px}
+.err{background:#fff0f0;border:1px solid #fca5a5;border-radius:8px;padding:14px;font-size:13px;color:#991b1b;margin-bottom:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="badge">ADECCO TRAINING</div>
+  <h1>🎯 Analyse Financement</h1>
+</header>
+<div class="wrap" id="wrap">
+
+  <div id="result-zone"></div>
+
+  <div class="sh">🏢 Entreprise</div>
+  <div class="field"><label>Secteur</label>
+    <select id="secteur">
+      <option value="">--</option>
+      <option>Industrie / Manufacture</option><option>BTP / Construction</option>
+      <option>Commerce / Distribution</option><option>Transport / Logistique</option>
+      <option>Hôtellerie / Restauration</option><option>Santé / Social</option>
+      <option>Services aux entreprises</option><option>Numérique / Tech</option>
+      <option>Finance / Assurance</option><option>Agroalimentaire</option><option>Artisanat</option>
+    </select>
+  </div>
+  <div class="r2">
+    <div class="field"><label>Taille</label>
+      <select id="taille"><option value="">--</option>
+        <option>TPE (1–10)</option><option>PME (11–50)</option><option>PME (51–250)</option><option>ETI (251–5000)</option><option>Grande (+5000)</option>
+      </select>
+    </div>
+    <div class="field"><label>OPCO</label>
+      <select id="opco"><option value="">--</option>
+        <option>OPCO EP</option><option>OPCO 2i</option><option>OPCO Mobilités</option>
+        <option>OPCO Atlas</option><option>OPCO Santé</option><option>AFDAS</option>
+        <option>Constructys</option><option>Uniformation</option><option>AKTO</option>
+        <option>OCAPIAT</option><option>Opcommerce</option>
+      </select>
+    </div>
+  </div>
+  <div class="field"><label>Région</label>
+    <select id="region"><option value="">--</option>
+      <option>Centre-Val de Loire</option><option>Pays de la Loire</option>
+      <option>Bretagne</option><option>Nouvelle-Aquitaine</option>
+      <option>Île-de-France</option><option>Hauts-de-France</option><option>Normandie</option><option>PACA</option>
+    </select>
+  </div>
+
+  <div class="sh">👤 Bénéficiaire(s)</div>
+  <div class="r2">
+    <div class="field"><label>Statut</label>
+      <select id="statut"><option value="">--</option>
+        <option>CDI</option><option>CDD</option><option>Intérimaire</option>
+        <option>Alternant</option><option>Demandeur d'emploi</option><option>En reconversion</option>
+      </select>
+    </div>
+    <div class="field"><label>Âge</label>
+      <select id="age"><option value="">--</option>
+        <option>Moins de 26 ans</option><option>26–45 ans</option><option>Plus de 45 ans</option>
+      </select>
+    </div>
+    <div class="field"><label>Qualification</label>
+      <select id="qualif"><option value="">--</option>
+        <option>Sans diplôme</option><option>CAP / BEP</option><option>Bac</option>
+        <option>Bac+2</option><option>Bac+3</option><option>Bac+5+</option>
+      </select>
+    </div>
+    <div class="field"><label>Nb bénéficiaires</label>
+      <select id="nb"><option value="">--</option>
+        <option>1 personne</option><option>2 à 5</option><option>6 à 20</option><option>+ de 20</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="sh">📚 Formation</div>
+  <div class="field"><label>Thématique</label>
+    <input type="text" id="formation" placeholder="Ex : Management, Logistique, Soudure...">
+  </div>
+  <div class="r2">
+    <div class="field"><label>Type</label>
+      <select id="type_f"><option value="">--</option>
+        <option>Présentiel</option><option>Distanciel</option><option>Mixte</option><option>AFEST</option><option>Alternance</option>
+      </select>
+    </div>
+    <div class="field"><label>Durée</label>
+      <select id="duree"><option value="">--</option>
+        <option>Moins de 14h</option><option>14h à 70h</option><option>70h à 400h</option><option>Plus de 400h</option>
+      </select>
+    </div>
+    <div class="field"><label>Certification</label>
+      <select id="certif"><option value="">Aucune</option>
+        <option>Diplôme d'État</option><option>Titre RNCP</option><option>CQP</option><option>Certification RS</option><option>Habilitation</option>
+      </select>
+    </div>
+    <div class="field"><label>Coût estimé (€)</label>
+      <input type="number" id="cout" placeholder="Ex : 3500">
+    </div>
+  </div>
+  <div class="field"><label>Objectif / contexte</label>
+    <textarea id="objectif" placeholder="Suite à l'intégration d'un ERP..."></textarea>
+  </div>
+
+  <div id="err-zone"></div>
+
+  <button class="btn btn-rouge" id="btn" onclick="analyser()">
+    <div class="spinner" id="sp"></div>
+    <span id="txt">🎯 Analyser les financements</span>
+  </button>
+
+</div>
+<script>
+const KEY='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';
+const v=id=>document.getElementById(id).value;
+
+function pCol(p){
+  if(p===1)return{bg:'#dcfce7',c:'#166534',cls:'p1',l:'★ Priorité 1'};
+  if(p===2)return{bg:'#fef3c7',c:'#92400e',cls:'p2',l:'◆ Priorité 2'};
+  if(p===3)return{bg:'#dbeafe',c:'#1e40af',cls:'p3',l:'◇ Priorité 3'};
+  return{bg:'#f3f4f6',c:'#6b7280',cls:'p0',l:'Optionnel'};
+}
+
+async function analyser(){
+  const btn=document.getElementById('btn'),sp=document.getElementById('sp'),txt=document.getElementById('txt');
+  btn.disabled=true; sp.style.display='block'; txt.textContent='Analyse…';
+  document.getElementById('err-zone').innerHTML='';
+  document.getElementById('result-zone').innerHTML='';
+
+  const prompt=`Expert financement formation professionnelle France, Adecco Training, territoire 37/49/36/18.
+Profil :
+- Entreprise : ${v('secteur')||'?'}, ${v('taille')||'?'}, OPCO: ${v('opco')||'?'}, Région: ${v('region')||'?'}
+- Bénéficiaire : ${v('statut')||'?'}, ${v('age')||'?'}, ${v('qualif')||'?'}, ${v('nb')||'?'}
+- Formation : ${v('formation')||'?'}, ${v('type_f')||'?'}, ${v('duree')||'?'}, Certif: ${v('certif')||'aucune'}, Coût: ${v('cout')||'?'}€
+- Objectif : ${v('objectif')||'?'}
+Réponds UNIQUEMENT avec ce JSON valide, rien d'autre :
+{"montant_total":"fourchette ex 2000€-8500€","synthese":"3-4 phrases","dispositifs":[{"nom":"nom","priorite":1,"montant":"montant","description":"2-3 phrases","interlocuteur":"qui","delai":"délai"}],"etapes":["étape 1","étape 2","étape 3"],"vigilance":"1-2 points"}
+Inclus 3 à 5 dispositifs, priorités 1/2/3.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const raw=(data.content||[]).map(b=>b.text||'').join('');
+    const m=raw.match(/\{[\s\S]*\}/);
+    if(!m)throw new Error('Réponse invalide');
+    const r=JSON.parse(m[0]);
+    afficher(r);
+  }catch(e){
+    document.getElementById('err-zone').innerHTML=`<div class="err">⚠ ${e.message}</div>`;
+  }finally{
+    btn.disabled=false; sp.style.display='none'; txt.textContent='↺ Relancer l\'analyse';
+  }
+}
+
+function afficher(r){
+  const rz=document.getElementById('result-zone');
+  let h=`<div class="montant-badge">💰 ${r.montant_total}</div>`;
+  h+=`<div class="result-box"><h3>Synthèse</h3><p style="font-size:13px;line-height:1.8;color:#444">${r.synthese}</p></div>`;
+  h+=`<div class="sh">Dispositifs recommandés</div>`;
+  (r.dispositifs||[]).forEach(d=>{
+    const pc=pCol(d.priorite);
+    h+=`<div class="dispo">
+      <div class="dispo-top">
+        <span class="dispo-nom">${d.nom}</span>
+        <span class="badge-p ${pc.cls}">${pc.l}</span>
+        ${d.montant?`<span class="badge-m">${d.montant}</span>`:''}
+      </div>
+      <div class="dispo-desc">${d.description}</div>
+      <div class="dispo-meta">
+        ${d.interlocuteur?`<div class="meta-item"><strong>Interlocuteur</strong><span>${d.interlocuteur}</span></div>`:''}
+        ${d.delai?`<div class="meta-item"><strong>Délai</strong><span>${d.delai}</span></div>`:''}
+      </div>
+    </div>`;
+  });
+  if(r.etapes?.length){
+    h+=`<div class="result-box"><h3>Plan d'action</h3>`;
+    r.etapes.forEach((e,i)=>h+=`<div class="etape"><div class="etape-n">${i+1}</div><div>${e}</div></div>`);
+    h+=`</div>`;
+  }
+  if(r.vigilance)h+=`<div class="alert">⚠️ ${r.vigilance}</div>`;
+  h+=`<button class="btn btn-ghost" onclick="document.getElementById('result-zone').innerHTML='';document.getElementById('btn').querySelector('span').textContent='🎯 Analyser les financements'">↩ Nouveau profil</button>`;
+  rz.innerHTML=h;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

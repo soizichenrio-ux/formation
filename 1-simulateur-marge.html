@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur Marge — Adecco Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--rouge:#ff1a35;--vert:#00e676;--orange:#ffab40;--bleu:#40c4ff;--bg:#080c10;--s1:#0e1419;--s2:#141b22;--b1:#1e2a35;--b2:#253040;--t1:#e8edf2;--t2:#5a7080;--t3:#3a4f60}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh}
+header{background:#0a0e14;border-bottom:1px solid var(--b1);padding:12px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.badge{background:var(--rouge);color:white;font-size:9px;font-weight:700;padding:3px 8px;border-radius:3px;font-family:'Space Mono',monospace}
+header h1{font-size:13px;font-weight:600}
+.live{margin-left:auto;font-size:9px;color:var(--vert);font-family:'Space Mono',monospace;display:flex;align-items:center;gap:5px}
+.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--vert);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.wrap{padding:16px;max-width:600px;margin:0 auto}
+.sh{font-family:'Space Mono',monospace;font-size:9px;color:var(--t2);letter-spacing:.14em;text-transform:uppercase;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.sh::after{content:'';flex:1;height:1px;background:var(--b1)}
+.field{margin-bottom:10px}
+.field label{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:4px}
+.field label span{font-family:'Space Mono',monospace;font-size:9px;color:var(--t3)}
+input,select,textarea{width:100%;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:8px;color:var(--t1);font-family:'Outfit',sans-serif;font-size:14px;box-sizing:border-box}
+input:focus,select:focus{outline:none;border-color:var(--rouge)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%235a7080'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sc-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:4px}
+.sc-btn{background:var(--s1);border:1.5px solid var(--b2);border-radius:10px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .18s}
+.sc-btn.active{border-color:var(--rouge);background:rgba(255,26,53,.15)}
+.sc-btn .ico{font-size:18px;margin-bottom:4px}
+.sc-btn .nm{font-size:10px;color:var(--t2);font-weight:600}
+.box{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px;margin-bottom:12px}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:12px}
+.kl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.kv{font-family:'Space Mono',monospace;font-size:20px;font-weight:700}
+.ks{font-size:10px;color:var(--t3);margin-top:3px}
+.jauge-bg{width:100%;height:8px;background:var(--b2);border-radius:4px;overflow:hidden}
+.jauge-fill{height:100%;border-radius:4px;transition:width .5s}
+.jm{display:flex;justify-content:space-between;margin-top:5px;font-family:'Space Mono',monospace;font-size:9px;color:var(--t3)}
+.verdict{margin-top:10px;padding:8px;border-radius:8px;text-align:center;font-size:13px;font-weight:600}
+.wf-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.wf-l{width:100px;font-size:11px;color:var(--t2);flex-shrink:0}
+.wf-bw{flex:1;height:14px;background:var(--s2);border-radius:3px;overflow:hidden}
+.wf-b{height:100%;border-radius:3px;transition:width .5s;opacity:.85}
+.wf-a{width:72px;text-align:right;font-family:'Space Mono',monospace;font-size:11px;flex-shrink:0}
+.pm-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:center}
+.pm-v{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--orange)}
+.pm-l{font-size:10px;color:var(--t3);margin-top:3px}
+.sc-compare{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.sc-c{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:12px;text-align:center}
+.sc-c.act{border-color:var(--rouge);background:rgba(255,26,53,.15)}
+.sc-ct{font-size:9px;color:var(--t2);font-weight:700;letter-spacing:.05em;margin-bottom:6px;text-transform:uppercase}
+.sc-cv{font-family:'Space Mono',monospace;font-size:15px;font-weight:700}
+.sc-cs{font-size:9px;color:var(--t3);margin-top:3px}
+.ia-card{background:var(--s2);border:1px solid var(--b2);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.ia-h{background:linear-gradient(90deg,#1a0a0d,#0e1419);padding:12px 16px;border-bottom:1px solid var(--b1)}
+.ia-h span{font-family:'Space Mono',monospace;font-size:10px;color:var(--rouge);font-weight:700;letter-spacing:.1em}
+.ia-b{padding:16px;font-size:13px;line-height:1.8;color:#90a8b8}
+.ia-b p{margin-bottom:10px}
+.tag{display:inline-block;font-family:'Space Mono',monospace;font-size:9px;padding:2px 6px;border-radius:3px;margin-right:6px;font-weight:700}
+.btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;font-family:'Outfit',sans-serif}
+.btn-rouge{background:var(--rouge);color:white;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-rouge:disabled{background:#333;color:#555;cursor:not-allowed}
+.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.2);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+input[type=range]{background:none;border:none;padding:4px 0;accent-color:var(--rouge)}
+</style>
+</head>
+<body>
+<header>
+  <div class="badge">ADECCO TRAINING</div>
+  <h1>Simulateur Marge & Rentabilité</h1>
+  <div class="live">TEMPS RÉEL</div>
+</header>
+<div class="wrap">
+  <div class="sh">Scénario rapide</div>
+  <div class="sc-row">
+    <div class="sc-btn active" id="sc-inter" onclick="loadSc('inter')"><div class="ico">👥</div><div class="nm">Inter-ent.</div></div>
+    <div class="sc-btn" id="sc-intra" onclick="loadSc('intra')"><div class="ico">🏢</div><div class="nm">Intra-ent.</div></div>
+    <div class="sc-btn" id="sc-alt" onclick="loadSc('alt')"><div class="ico">🤝</div><div class="nm">Alternance</div></div>
+  </div>
+
+  <div class="sh">Résultats</div>
+  <div class="kpi-grid">
+    <div class="kpi" id="kpi-ca" style="border-top:2px solid var(--bleu)"><div class="kl">CA Brut</div><div class="kv" id="r-ca" style="color:var(--bleu)">—</div><div class="ks" id="r-ca-s"></div></div>
+    <div class="kpi" style="border-top:2px solid var(--orange)"><div class="kl">Coûts Totaux</div><div class="kv" id="r-ct" style="color:var(--orange)">—</div><div class="ks" id="r-ct-s"></div></div>
+    <div class="kpi" id="kpi-mn"><div class="kl">Marge Nette</div><div class="kv" id="r-mn">—</div><div class="ks" id="r-mn-s"></div></div>
+    <div class="kpi" id="kpi-tmn"><div class="kl">Taux Marge</div><div class="kv" id="r-tmn">—</div><div class="ks" id="r-tmn-s"></div></div>
+  </div>
+
+  <div class="box">
+    <div class="sh" style="margin-top:0">Indicateur de rentabilité</div>
+    <div class="jauge-bg"><div class="jauge-fill" id="jauge-fill" style="width:2%"></div></div>
+    <div class="jm"><span>0%</span><span style="color:var(--rouge)">10%</span><span style="color:var(--orange)">20%</span><span style="color:var(--vert)">30%</span><span>40%+</span></div>
+    <div class="verdict" id="verdict"></div>
+  </div>
+
+  <div class="box">
+    <div class="sh" style="margin-top:0">Point mort</div>
+    <div class="pm-g">
+      <div><div class="pm-v" id="r-npm">—</div><div class="pm-l">Nb minimum</div></div>
+      <div><div class="pm-v" id="r-capm">—</div><div class="pm-l">CA minimum</div></div>
+    </div>
+    <div id="r-pms" style="margin-top:10px;font-size:12px;text-align:center"></div>
+  </div>
+
+  <div class="sc-compare">
+    <div class="sc-c"><div class="sc-ct">📉 Prudent</div><div class="sc-cv" id="sp-v">—</div><div class="sc-cs" id="sp-s"></div></div>
+    <div class="sc-c act"><div class="sc-ct">🎯 Cible</div><div class="sc-cv" id="sc-v">—</div><div class="sc-cs" id="sc-s"></div></div>
+    <div class="sc-c"><div class="sc-ct">📈 Plein</div><div class="sc-cv" id="spl-v">—</div><div class="sc-cs" id="spl-s"></div></div>
+  </div>
+
+  <div class="box">
+    <div class="sh" style="margin-top:0">Décomposition des coûts</div>
+    <div id="wf"></div>
+  </div>
+
+  <div class="sh">Paramètres</div>
+  <div class="field">
+    <label>Financement</label>
+    <select id="fin" onchange="calcul()">
+      <option>OPCO — Plan de compétences</option><option>CPF / CPF Transition</option>
+      <option>Pro-A</option><option>FNE-Formation</option>
+      <option>Financement Région</option><option>Direct client</option><option>Mixte</option>
+    </select>
+  </div>
+  <div class="r2">
+    <div class="field"><label>Stagiaires <span>PAX</span></label><input type="number" id="nb" value="10" min="1" oninput="calcul()"></div>
+    <div class="field"><label>Prix/stag./jour <span>€ HT</span></label><input type="number" id="prix" value="420" oninput="calcul()"></div>
+    <div class="field"><label>Nb jours <span>J</span></label><input type="number" id="jours" value="2" min="0.5" step="0.5" oninput="calcul()"></div>
+    <div class="field"><label>Prise en charge <span>%</span></label><input type="number" id="pc" value="100" min="0" max="100" oninput="calcul()"></div>
+    <div class="field"><label>Formateur/jour <span>€</span></label><input type="number" id="form" value="700" oninput="calcul()"></div>
+    <div class="field"><label>Nb formateurs <span>PERS.</span></label><input type="number" id="nf" value="1" oninput="calcul()"></div>
+    <div class="field"><label>Salle/jour <span>€</span></label><input type="number" id="salle" value="150" oninput="calcul()"></div>
+    <div class="field"><label>Repas/pers./j <span>€</span></label><input type="number" id="repas" value="18" oninput="calcul()"></div>
+    <div class="field"><label>Déplacements <span>€</span></label><input type="number" id="dep" value="60" oninput="calcul()"></div>
+    <div class="field"><label>Supports <span>€</span></label><input type="number" id="sup" value="40" oninput="calcul()"></div>
+  </div>
+  <div class="field">
+    <label>Overhead Adecco <span id="oh-val">20%</span></label>
+    <input type="range" id="oh" min="5" max="40" value="20" oninput="document.getElementById('oh-val').textContent=this.value+'%';calcul()">
+  </div>
+
+  <button class="btn btn-rouge" id="btn-ia" onclick="analyseIA()">
+    <div class="spinner" id="sp"></div>
+    <span id="txt-ia">✦ Analyse IA de la rentabilité</span>
+  </button>
+
+  <div class="ia-card" id="ia-zone" style="display:none">
+    <div class="ia-h"><span>// ANALYSE IA — DIAGNOSTIC RENTABILITÉ</span></div>
+    <div class="ia-b" id="ia-content"></div>
+  </div>
+</div>
+
+<script>
+const KEY = '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';
+const fmt = n => new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0}).format(n);
+const pct = n => n.toFixed(1)+' %';
+const col = m => m>=25?'#00e676':m>=10?'#ffab40':'#ff1a35';
+const g = id => parseFloat(document.getElementById(id).value)||0;
+
+const SCS = {
+  inter:{nb:10,prix:420,jours:2,pc:100,form:700,nf:1,salle:150,repas:18,dep:60,sup:40,oh:20},
+  intra:{nb:12,prix:380,jours:3,pc:80,form:850,nf:1,salle:0,repas:20,dep:120,sup:80,oh:20},
+  alt:  {nb:5,prix:2800,jours:20,pc:100,form:550,nf:2,salle:200,repas:12,dep:0,sup:150,oh:25}
+};
+
+function loadSc(id) {
+  ['inter','intra','alt'].forEach(k=>document.getElementById('sc-'+k).classList.remove('active'));
+  document.getElementById('sc-'+id).classList.add('active');
+  Object.entries(SCS[id]).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v;});
+  document.getElementById('oh-val').textContent=SCS[id].oh+'%';
+  calcul();
+}
+
+function marge(nb,prix,jours,form,nf,salle,repas,dep,sup,oh) {
+  const ca=nb*prix*jours;
+  const cd=form*nf*jours+salle*jours+repas*nb*jours+dep+sup;
+  return ca>0?(ca-cd-ca*oh/100)/ca*100:0;
+}
+
+function calcul() {
+  const nb=g('nb'),prix=g('prix'),jours=g('jours'),pc=g('pc')/100;
+  const form=g('form'),nf=g('nf'),salle=g('salle'),repas=g('repas'),dep=g('dep'),sup=g('sup'),oh=g('oh');
+  const ca=nb*prix*jours, cd=form*nf*jours+salle*jours+repas*nb*jours+dep+sup;
+  const coh=ca*oh/100, ct=cd+coh, mb=ca-cd, mn=ca-ct;
+  const tmb=ca>0?mb/ca*100:0, tmn=ca>0?mn/ca*100:0;
+  const npm=prix*jours>0?Math.ceil(ct/(prix*jours)):0;
+  const np=Math.round(nb*.7), npl=Math.min(Math.round(nb*1.3),25);
+
+  document.getElementById('r-ca').textContent=fmt(ca);
+  document.getElementById('r-ca-s').textContent='PC : '+fmt(ca*pc);
+  document.getElementById('r-ct').textContent=fmt(ct);
+  document.getElementById('r-ct-s').textContent='Dir. '+fmt(cd)+' · OH '+fmt(coh);
+  document.getElementById('r-mn').textContent=fmt(mn);
+  document.getElementById('r-mn').style.color=mn>=0?'#00e676':'#ff1a35';
+  document.getElementById('kpi-mn').style.borderTop='2px solid '+(mn>=0?'#00e676':'#ff1a35');
+  document.getElementById('r-mn-s').textContent='Brute : '+fmt(mb);
+  document.getElementById('r-tmn').textContent=pct(tmn);
+  document.getElementById('r-tmn').style.color=col(tmn);
+  document.getElementById('kpi-tmn').style.borderTop='2px solid '+col(tmn);
+  document.getElementById('r-tmn-s').textContent='Brute : '+pct(tmb);
+
+  const jg=tmn>=25?'linear-gradient(90deg,#00e676,#00bfa5)':tmn>=10?'linear-gradient(90deg,#ffab40,#ffd54f)':'linear-gradient(90deg,#ff1a35,#ff6b6b)';
+  document.getElementById('jauge-fill').style.cssText=`width:${Math.max(2,Math.min(100,tmn))}%;background:${jg}`;
+
+  const vd=tmn>=30?{t:'🟢 EXCELLENTE RENTABILITÉ',bg:'rgba(0,230,118,0.12)',c:'#00e676'}
+    :tmn>=20?{t:'🟡 BONNE RENTABILITÉ',bg:'rgba(255,171,64,0.12)',c:'#ffab40'}
+    :tmn>=10?{t:'🟠 RENTABILITÉ CORRECTE',bg:'rgba(255,171,64,0.1)',c:'#ffab40'}
+    :tmn>=0?{t:'🔴 MARGE FAIBLE',bg:'rgba(255,26,53,0.12)',c:'#ff1a35'}
+    :{t:'⛔ PERTE — REVOIR',bg:'rgba(255,0,0,0.18)',c:'#ff1a35'};
+  const vel=document.getElementById('verdict');
+  vel.textContent=vd.t; vel.style.background=vd.bg; vel.style.color=vd.c;
+
+  document.getElementById('r-npm').textContent=npm+' stag.';
+  document.getElementById('r-capm').textContent=fmt(npm*prix*jours);
+  const ps=document.getElementById('r-pms');
+  ps.textContent=nb>=npm?'✓ Point mort atteint (+'+（nb-npm)+' stag.)':'⚠ Manque '+(npm-nb)+' stag.';
+  ps.style.color=nb>=npm?'#00e676':'#ff1a35';
+
+  const setS=(pid,sid,m,n)=>{document.getElementById(pid).textContent=pct(m);document.getElementById(pid).style.color=col(m);document.getElementById(sid).textContent=n+' stag.';};
+  setS('sp-v','sp-s',marge(np,prix,jours,form,nf,salle,repas,dep,sup,oh),np);
+  setS('sc-v','sc-s',tmn,nb);
+  setS('spl-v','spl-s',marge(npl,prix,jours,form,nf,salle,repas,dep,sup,oh),npl);
+
+  const wfData=[
+    {l:'Formateur(s)',v:form*nf*jours,c:'#ff6b6b'},{l:'Salle',v:salle*jours,c:'#ffa040'},
+    {l:'Repas',v:repas*nb*jours,c:'#ffcc40'},{l:'Déplacements',v:dep,c:'#40bfff'},
+    {l:'Supports',v:sup,c:'#a090ff'},{l:'Overhead',v:coh,c:'#7a8a9a'},
+  ];
+  document.getElementById('wf').innerHTML=wfData.map(w=>`
+    <div class="wf-row">
+      <div class="wf-l">${w.l}</div>
+      <div class="wf-bw"><div class="wf-b" style="width:${ct>0?Math.max(2,w.v/ct*100):0}%;background:${w.c}"></div></div>
+      <div class="wf-a" style="color:${w.c}">${fmt(w.v)}</div>
+    </div>`).join('');
+}
+
+async function analyseIA() {
+  const btn=document.getElementById('btn-ia'),sp=document.getElementById('sp'),txt=document.getElementById('txt-ia');
+  const zone=document.getElementById('ia-zone'),content=document.getElementById('ia-content');
+  btn.disabled=true; sp.style.display='block'; txt.textContent='Analyse…';
+  zone.style.display='block';
+  content.innerHTML='<p style="color:#5a7080;font-style:italic">⏳ Génération du diagnostic...</p>';
+
+  const nb=g('nb'),prix=g('prix'),jours=g('jours'),pc=g('pc');
+  const form=g('form'),nf=g('nf'),salle=g('salle'),repas=g('repas'),dep=g('dep'),sup=g('sup'),oh=g('oh');
+  const ca=nb*prix*jours, cd=form*nf*jours+salle*jours+repas*nb*jours+dep+sup;
+  const coh=ca*oh/100, mn=ca-cd-coh, tmn=ca>0?mn/ca*100:0;
+  const npm=prix*jours>0?Math.ceil((cd+coh)/(prix*jours)):0;
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':KEY,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:600,
+        messages:[{role:'user',content:`Tu es directeur financier Adecco Training.
+Action : ${nb} stag × ${prix}€/j × ${jours}j = CA ${ca}€. PC ${pc}%. Coûts directs ${cd.toFixed(0)}€, overhead ${coh.toFixed(0)}€. Marge nette ${mn.toFixed(0)}€ soit ${tmn.toFixed(1)}%. Point mort ${npm} stag.
+Réponds UNIQUEMENT avec ce JSON valide, rien d'autre avant ou après :
+{"diagnostic":"2-3 phrases benchmark sectoriel 15-35% marge nette","leviers":"2-3 actions concrètes pour ce dossier","recommandation":"comment pitcher pour maximiser CA"}`}]
+      })
+    });
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const raw=(data.content||[]).map(b=>b.text||'').join('');
+    const m=raw.match(/\{[\s\S]*\}/);
+    if(!m) throw new Error('Réponse invalide');
+    const r=JSON.parse(m[0]);
+    content.innerHTML=`
+      <p><span class="tag" style="background:rgba(255,171,64,.12);color:#ffab40">DIAGNOSTIC</span>${r.diagnostic||''}</p>
+      <p><span class="tag" style="background:rgba(0,230,118,.12);color:#00e676">LEVIERS</span>${r.leviers||''}</p>
+      <p><span class="tag" style="background:rgba(255,26,53,.15);color:#ff1a35">COMMERCIAL</span>${r.recommandation||''}</p>`;
+  } catch(e) {
+    content.innerHTML=`<p style="color:#ff1a35">⚠ Erreur : ${e.message}</p>`;
+  } finally {
+    btn.disabled=false; sp.style.display='none'; txt.textContent='↺ Relancer l\'analyse IA';
+  }
+}
+window.addEventListener('load',()=>loadSc('inter'));
+</script>
+</body>
+</html>

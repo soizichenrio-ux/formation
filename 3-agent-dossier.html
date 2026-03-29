@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Montage Dossier — Adecco Training</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--rouge:#E8001C;--noir:#0f0f0f;--fond:#F4F3F0;--blanc:#fff;--border:#E0DFDB;--sec:#5a5a5a;--vert:#1a7f5a;--orange:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--fond);color:var(--noir);min-height:100vh}
+header{background:var(--noir);padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10}
+.badge{background:var(--rouge);color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:3px}
+header h1{color:white;font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;flex:1}
+.btn-sm{background:none;border:1px solid #333;color:#888;padding:5px 12px;border-radius:6px;font-size:11px;cursor:pointer}
+.stepper{background:var(--blanc);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;gap:6px;align-items:center}
+.step{display:flex;align-items:center;gap:6px;flex:1}
+.step-n{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.step-n.done{background:var(--vert);color:white}
+.step-n.active{background:var(--rouge);color:white}
+.step-n.todo{background:#e5e7eb;color:#9ca3af}
+.step-l{font-size:11px;font-weight:500}
+.step-l.active{color:var(--noir)}
+.step-l.todo{color:#9ca3af}
+.wrap{padding:16px;max-width:640px;margin:0 auto}
+.sh{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--rouge);margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--sec);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--fond);color:var(--noir)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--rouge);background:white}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 5 5-5z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;appearance:none;-webkit-appearance:none}
+textarea{resize:vertical;min-height:75px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.disp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.disp-btn{background:var(--blanc);border:2px solid var(--border);border-radius:12px;padding:16px 12px;cursor:pointer;text-align:center;transition:all .18s}
+.disp-btn.sel{border-color:var(--rouge);background:#fff5f5}
+.disp-btn .ico{font-size:22px;margin-bottom:6px}
+.disp-btn .nm{font-size:12px;font-weight:600;line-height:1.3}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-family:'DM Serif Display',serif;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+.btn-rouge{background:var(--rouge);color:white}
+.btn-rouge:disabled{background:#ccc;cursor:not-allowed}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--sec);font-family:'DM Sans',sans-serif;font-size:14px;border-radius:10px;padding:12px}
+.spinner{width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result-box{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px}
+.result-box h3{font-family:'DM Serif Display',serif;font-size:16px;font-weight:400;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.success{background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;padding:14px;margin-bottom:12px}
+.success .montant{font-family:'DM Serif Display',serif;font-size:18px;color:var(--vert)}
+.doc-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px}
+.doc-item:last-child{border-bottom:none}
+.doc-ico{flex-shrink:0;font-weight:700}
+.doc-ico.req{color:var(--rouge)}.doc-ico.opt{color:var(--vert)}
+.etape{display:flex;gap:10px;margin-bottom:10px;font-size:13px;align-items:flex-start}
+.etape-n{background:var(--rouge);color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.pf-item{display:flex;gap:8px;margin-bottom:6px;font-size:13px}
+.alert{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px;font-size:13px;color:var(--orange);line-height:1.6;margin-bottom:12px}
+.err{background:#fff0f0;border:1px solid #fca5a5;border-radius:8px;padding:14px;font-size:13px;color:#991b1b;margin-bottom:12px}
+.info-disp{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px;font-size:13px;color:#1e40af;line-height:1.6;margin-bottom:16px}
+</style>
+</head>
+<body>
+<header>
+  <div class="badge">ADECCO TRAINING</div>
+  <h1 id="h-title">📂 Montage Dossier</h1>
+  <button class="btn-sm" onclick="reset()" id="btn-reset" style="display:none">↩ Recommencer</button>
+</header>
+
+<div class="stepper">
+  <div class="step"><div class="step-n active" id="sn1">1</div><span class="step-l active" id="sl1">Dispositif</span></div>
+  <div style="flex:none;color:#ccc;font-size:18px">›</div>
+  <div class="step"><div class="step-n todo" id="sn2">2</div><span class="step-l todo" id="sl2">Profil</span></div>
+  <div style="flex:none;color:#ccc;font-size:18px">›</div>
+  <div class="step"><div class="step-n todo" id="sn3">3</div><span class="step-l todo" id="sl3">Dossier</span></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ÉTAPE 1 -->
+  <div id="page1">
+    <div class="sh">Quel dispositif monter ?</div>
+    <div class="disp-grid" id="disp-grid"></div>
+    <button class="btn btn-rouge" id="btn-next1" onclick="goStep2()" disabled>Continuer →</button>
+  </div>
+
+  <!-- ÉTAPE 2 -->
+  <div id="page2" style="display:none">
+    <div class="info-disp" id="info-disp"></div>
+
+    <div class="sh">🏢 Entreprise</div>
+    <div class="r2">
+      <div class="field"><label>Raison sociale</label><input type="text" id="rs" placeholder="DUPONT SAS"></div>
+      <div class="field"><label>SIRET</label><input type="text" id="siret" placeholder="123 456 789..."></div>
+    </div>
+    <div class="r2">
+      <div class="field"><label>Secteur</label>
+        <select id="secteur"><option value="">--</option>
+          <option>Industrie / Manufacture</option><option>BTP / Construction</option>
+          <option>Commerce / Distribution</option><option>Transport / Logistique</option>
+          <option>Hôtellerie / Restauration</option><option>Santé / Social</option>
+          <option>Services aux entreprises</option><option>Numérique / Tech</option>
+          <option>Agroalimentaire</option><option>Artisanat</option>
+        </select>
+      </div>
+      <div class="field"><label>Taille</label>
+        <select id="taille"><option value="">--</option>
+          <option>TPE (1–10)</option><option>PME (11–50)</option><option>PME (51–250)</option><option>ETI (+250)</option>
+        </select>
+      </div>
+      <div class="field"><label>OPCO</label>
+        <select id="opco"><option value="">--</option>
+          <option>OPCO EP</option><option>OPCO 2i</option><option>OPCO Mobilités</option>
+          <option>OPCO Atlas</option><option>OPCO Santé</option><option>Constructys</option>
+          <option>Uniformation</option><option>AKTO</option><option>OCAPIAT</option><option>Opcommerce</option>
+        </select>
+      </div>
+      <div class="field"><label>Région</label>
+        <select id="region"><option value="">--</option>
+          <option>Centre-Val de Loire</option><option>Pays de la Loire</option>
+          <option>Bretagne</option><option>Nouvelle-Aquitaine</option>
+          <option>Île-de-France</option><option>Hauts-de-France</option><option>Normandie</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sh">👤 Bénéficiaire(s)</div>
+    <div class="field"><label>Nom prénom</label><input type="text" id="nom" placeholder="Marie Dupont"></div>
+    <div class="r2">
+      <div class="field"><label>Statut</label>
+        <select id="statut"><option value="">--</option>
+          <option>CDI</option><option>CDD</option><option>Intérimaire</option>
+          <option>Demandeur d'emploi</option><option>En reconversion</option>
+        </select>
+      </div>
+      <div class="field"><label>Âge</label>
+        <select id="age"><option value="">--</option>
+          <option>Moins de 26 ans</option><option>26–44 ans</option><option>45 ans+</option>
+        </select>
+      </div>
+      <div class="field"><label>Ancienneté</label>
+        <select id="anc"><option value="">--</option>
+          <option>Moins de 1 an</option><option>1–3 ans</option><option>3–10 ans</option><option>+ 10 ans</option>
+        </select>
+      </div>
+      <div class="field"><label>Qualification</label>
+        <select id="qualif"><option value="">--</option>
+          <option>Sans diplôme</option><option>CAP / BEP</option><option>Bac</option>
+          <option>Bac+2</option><option>Bac+3</option><option>Bac+5+</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Nb bénéficiaires</label>
+      <select id="nb"><option value="">--</option>
+        <option>1 personne</option><option>2 à 5</option><option>6 à 20</option><option>+ de 20</option>
+      </select>
+    </div>
+
+    <div class="sh">📚 Formation</div>
+    <div class="field"><label>Intitulé</label><input type="text" id="formation" placeholder="Formation Manager de Proximité..."></div>
+    <div class="r2">
+      <div class="field"><label>Durée (h)</label><input type="number" id="dh" placeholder="70"></div>
+      <div class="field"><label>Durée (j)</label><input type="number" id="dj" placeholder="10"></div>
+      <div class="field"><label>Modalité</label>
+        <select id="modalite"><option value="">--</option>
+          <option>Présentiel</option><option>Distanciel</option><option>Mixte</option><option>AFEST</option><option>Alternance</option>
+        </select>
+      </div>
+      <div class="field"><label>Certification</label>
+        <select id="certif"><option value="">Aucune</option>
+          <option>Diplôme d'État</option><option>Titre RNCP</option><option>CQP</option><option>Certification RS</option>
+        </select>
+      </div>
+      <div class="field"><label>Coût HT (€)</label><input type="number" id="cout" placeholder="3500"></div>
+    </div>
+    <div class="field"><label>Objectif / contexte</label>
+      <textarea id="objectif" placeholder="Contexte et besoin de la formation..."></textarea>
+    </div>
+
+    <div id="err2"></div>
+    <button class="btn btn-rouge" id="btn-gen" onclick="generer()">
+      <div class="spinner" id="sp2"></div>
+      <span id="txt2">✦ Générer le dossier</span>
+    </button>
+    <button class="btn btn-ghost" onclick="goStep1()">← Changer de dispositif</button>
+  </div>
+
+  <!-- ÉTAPE 3 -->
+  <div id="page3" style="display:none">
+    <div id="result3"></div>
+  </div>
+
+</div>
+<script>
+const KEY='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';
+const v=id=>(document.getElementById(id)||{}).value||'';
+
+const DISPS=[
+  {id:'plan',ico:'📋',nom:'Plan de compétences',info:'Financement OPCO. Décision de l\'employeur. Accord de branche requis pour les montants.'},
+  {id:'cpf',ico:'💳',nom:'CPF',info:'Le salarié mobilise ses droits sur moncompteformation.gouv.fr. Formation éligible CPF obligatoire.'},
+  {id:'cpft',ico:'🔄',nom:'CPF Transition Pro',info:'Reconversion longue. Dossier soumis à Transitions Pro région. CEP obligatoire. Délai 2-4 mois.'},
+  {id:'proa',ico:'🔼',nom:'Pro-A',info:'Alternance pour CDI. Accord de branche Pro-A signé nécessaire. Financement OPCO.'},
+  {id:'fne',ico:'🏛️',nom:'FNE-Formation',info:'Entreprises en mutation ou APLD. Dossier DREETS. Co-financement État variable.'},
+  {id:'region',ico:'🗺️',nom:'Financement Région',info:'Aides PRIC, chèques formation, FSE. Variable selon territoire. Attestation Qualiopi requise.'},
+  {id:'alt',ico:'🤝',nom:'Alternance',info:'Contrat apprentissage ou pro. Aide TPE/PME. Prise en charge OPCO selon NPEC.'},
+  {id:'poei',ico:'🎯',nom:'POEI / POEC',info:'Pour demandeurs d\'emploi. Convention tripartite France Travail. Offre d\'emploi requise (POEI).'},
+];
+
+let dispChoisi=null;
+
+// Build dispositifs grid
+document.getElementById('disp-grid').innerHTML=DISPS.map(d=>`
+  <div class="disp-btn" id="db-${d.id}" onclick="selDisp('${d.id}')">
+    <div class="ico">${d.ico}</div>
+    <div class="nm">${d.nom}</div>
+  </div>`).join('');
+
+function selDisp(id){
+  DISPS.forEach(d=>document.getElementById('db-'+d.id).classList.remove('sel'));
+  document.getElementById('db-'+id).classList.add('sel');
+  dispChoisi=id;
+  document.getElementById('btn-next1').disabled=false;
+}
+
+function setStep(n){
+  [1,2,3].forEach(i=>{
+    const sn=document.getElementById('sn'+i), sl=document.getElementById('sl'+i);
+    if(i<n){sn.className='step-n done';sn.textContent='✓';sl.className='step-l active';}
+    else if(i===n){sn.className='step-n active';sn.textContent=i;sl.className='step-l active';}
+    else{sn.className='step-n todo';sn.textContent=i;sl.className='step-l todo';}
+    document.getElementById('page'+i).style.display=i===n?'block':'none';
+  });
+  document.getElementById('btn-reset').style.display=n>1?'block':'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goStep1(){dispChoisi=null;DISPS.forEach(d=>document.getElementById('db-'+d.id).classList.remove('sel'));document.getElementById('btn-next1').disabled=true;setStep(1);}
+
+function goStep2(){
+  const d=DISPS.find(x=>x.id===dispChoisi);
+  document.getElementById('h-title').textContent='📂 '+d.nom;
+  document.getElementById('info-disp').innerHTML=`<strong>${d.ico} ${d.nom}</strong><br>${d.info}`;
+  setStep(2);
+}
+
+function reset(){goStep1();document.getElementById('result3').innerHTML='';document.getElementById('h-title').textContent='📂 Montage Dossier';}
+
+async function generer(){
+  const btn=document.getElementById('btn-gen'),sp=document.getElementById('sp2'),txt=document.getElementById('txt2');
+  btn.disabled=true; sp.style.display='block'; txt.textContent='Génération…';
+  document.getElementById('err2').innerHTML='';
+  const dispNom=DISPS.find(d=>d.id===dispChoisi)?.nom||dispChoisi;
+
+  const prompt=`Expert ingénierie financière formation, Adecco Training.
+Dispositif : ${dispNom}
+Entreprise : ${v('rs')} (${v('siret')}), ${v('secteur')}, ${v('taille')}, OPCO: ${v('opco')}, Région: ${v('region')}
+Bénéficiaire : ${v('nom')}, ${v('statut')}, ${v('age')}, ancienneté ${v('anc')}, ${v('qualif')}, ${v('nb')}
+Formation : ${v('formation')}, ${v('dh')}h/${v('dj')}j, ${v('modalite')}, certif: ${v('certif')}, coût: ${v('cout')}€
+Objectif : ${v('objectif')}
+Réponds UNIQUEMENT avec ce JSON valide, rien d'autre :
+{"titre":"titre dossier","ref":"REF-2026-XXX","montant":"montant pris en charge","synthese":"4-5 phrases","argumentaire":"6-7 phrases style administratif","points_forts":["pf1","pf2","pf3"],"points_vigilance":["pv1","pv2"],"documents":[{"doc":"nom","obligatoire":true,"note":"précision"}],"etapes":[{"etape":"action","delai":"J-X","qui":"responsable"}],"vigilance_globale":"2 phrases"}`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const raw=(data.content||[]).map(b=>b.text||'').join('');
+    const m=raw.match(/\{[\s\S]*\}/);
+    if(!m)throw new Error('Réponse invalide');
+    const r=JSON.parse(m[0]);
+    afficher(r);
+    setStep(3);
+  }catch(e){
+    document.getElementById('err2').innerHTML=`<div class="err">⚠ ${e.message}</div>`;
+  }finally{
+    btn.disabled=false; sp.style.display='none'; txt.textContent='✦ Générer le dossier';
+  }
+}
+
+function afficher(r){
+  let h=`<div class="success"><div class="montant">💰 ${r.montant}</div><div style="font-size:12px;color:#166534;margin-top:4px">${r.ref}</div></div>`;
+  h+=`<div class="result-box"><h3>${r.titre}</h3><p style="font-size:13px;line-height:1.8;color:#444">${r.synthese}</p></div>`;
+  h+=`<div class="result-box"><h3>Argumentaire</h3><p style="font-size:13px;line-height:1.8;color:#444">${r.argumentaire}</p></div>`;
+
+  h+=`<div class="r2" style="margin-bottom:12px">`;
+  h+=`<div class="result-box"><h3 style="color:#1a7f5a">✓ Points forts</h3>`;
+  (r.points_forts||[]).forEach(p=>h+=`<div class="pf-item"><span style="color:#1a7f5a;font-weight:700">✓</span><span>${p}</span></div>`);
+  h+=`</div>`;
+  h+=`<div class="result-box"><h3 style="color:#d97706">⚠ Vigilance</h3>`;
+  (r.points_vigilance||[]).forEach(p=>h+=`<div class="pf-item"><span style="color:#d97706;font-weight:700">!</span><span>${p}</span></div>`);
+  h+=`</div></div>`;
+
+  h+=`<div class="result-box"><h3>📂 Documents nécessaires</h3>`;
+  (r.documents||[]).forEach(d=>{
+    h+=`<div class="doc-item"><span class="doc-ico ${d.obligatoire?'req':'opt'}">${d.obligatoire?'●':'○'}</span>
+    <div><strong>${d.doc}</strong> <span style="font-size:10px;color:${d.obligatoire?'#E8001C':'#5a5a5a'}">${d.obligatoire?'obligatoire':'recommandé'}</span>
+    ${d.note?`<br><span style="font-size:11px;color:#888">${d.note}</span>`:''}</div></div>`;
+  });
+  h+=`</div>`;
+
+  h+=`<div class="result-box"><h3>🗓 Planning de montage</h3>`;
+  (r.etapes||[]).forEach((e,i)=>h+=`<div class="etape"><div class="etape-n">${i+1}</div><div><strong>${e.etape}</strong><br><span style="font-size:11px;color:#888">${e.delai} · ${e.qui}</span></div></div>`);
+  h+=`</div>`;
+
+  if(r.vigilance_globale)h+=`<div class="alert">⚠️ ${r.vigilance_globale}</div>`;
+  h+=`<button class="btn btn-rouge" onclick="window.print()" style="margin-bottom:8px">🖨️ Imprimer / PDF</button>`;
+  h+=`<button class="btn btn-ghost" onclick="reset()">+ Nouveau dossier</button>`;
+  document.getElementById('result3').innerHTML=h;
+}
+</script>
+</body>
+</html>
